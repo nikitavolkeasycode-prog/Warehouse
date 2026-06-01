@@ -1,6 +1,19 @@
 #include "FileIO.h"
 #include <fstream>
 #include <iostream>
+#include <string>
+
+// UTF-8 BOM: 0xEF, 0xBB, 0xBF в начале файла.
+// Блокнот Windows добавляет его при сохранении в UTF-8. Без удаления
+// первая строка ломает парсинг (ID превращается в мусор типа "\u00ef\u00bb\u00bf1").
+static void stripUtf8Bom(std::string& s) {
+    if (s.size() >= 3 &&
+        static_cast<unsigned char>(s[0]) == 0xEF &&
+        static_cast<unsigned char>(s[1]) == 0xBB &&
+        static_cast<unsigned char>(s[2]) == 0xBF) {
+        s.erase(0, 3);
+    }
+}
 
 bool FileIO::load(const std::string& filename, Warehouse& warehouse) {
     std::ifstream file(filename);
@@ -13,8 +26,10 @@ bool FileIO::load(const std::string& filename, Warehouse& warehouse) {
     std::string line;
     int lineNum = 0;
     while (std::getline(file, line)) {
+        // BOM может появиться только в самом начале файла — снимаем один раз.
+        if (lineNum == 0) stripUtf8Bom(line);
+
         lineNum++;
-        // Skip empty lines
         if (line.empty()) continue;
 
         try {

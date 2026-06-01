@@ -340,10 +340,9 @@ void Menu::handleLoad() {
 }
 
 void Menu::run() {
-    // Дополнительно дублируем настройки кодировки (на случай, если main не выполнился)
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
-    setlocale(LC_ALL, ".UTF8");
+    // На случай, если Menu::run() вызывается не из main() (тесты и т.п.),
+    // повторно устанавливаем UTF-8 локаль. Реализация в Menu.h.
+    enableUtf8Locale();
 
     std::cout << "Добро пожаловать в систему складского учёта!\n";
 
