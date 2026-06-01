@@ -67,8 +67,8 @@
 
 ```bash
 # Клонирование репозитория
-git clone https://github.com/username/WarehouseApp.git
-cd WarehouseApp
+git clone https://github.com/nikitavolkeasycode-prog/Warehouse.git
+cd Warehouse
 
 # Создание папки сборки
 mkdir build
