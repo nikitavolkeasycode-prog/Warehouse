@@ -1,0 +1,28 @@
+# Build directories
+build/
+cmake-build-*/
+out/
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.user
+*.suo
+
+# Compiled files
+*.exe
+*.out
+*.o
+*.obj
+*.dll
+*.lib
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
