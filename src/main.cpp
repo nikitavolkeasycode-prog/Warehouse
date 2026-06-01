@@ -4,8 +4,20 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <clocale>
+#include <Windows.h>
 
 int main() {
+    // --- Корректное отображение и ввод кириллицы ---
+    // Переключаем консоль Windows на кодовую страницу UTF-8
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    // Устанавливаем локаль C/C++ в UTF-8, чтобы std::cin/cout работали
+    // с кириллицей корректно (иначе std::getline читает байты в старой
+    // кодировке и русские буквы "портятся" или попадают как пустая строка)
+    setlocale(LC_ALL, ".UTF8");
+    std::locale::global(std::locale(".UTF8"));
+
     // Пытаемся найти файл данных в нескольких возможных местах
     // (запуск из Visual Studio меняет рабочую директорию)
     std::string dataFilename;

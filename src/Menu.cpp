@@ -7,6 +7,7 @@
 #include <limits>
 #include <algorithm>
 #include <sstream>
+#include <clocale>
 
 Menu::Menu(const std::string& filename) : dataFilename(filename) {}
 
@@ -20,7 +21,12 @@ int Menu::readInt(const std::string& prompt, bool allowEmpty) {
     std::string input;
     while (true) {
         std::cout << prompt;
-        std::getline(std::cin, input);
+        if (!std::getline(std::cin, input)) {
+            // Ввод оборвался (Ctrl+Z / EOF) — сбрасываем состояние cin
+            std::cin.clear();
+            if (allowEmpty) return -1;
+            continue;
+        }
         if (allowEmpty && input.empty()) return -1;
         try {
             size_t pos;
@@ -37,7 +43,11 @@ double Menu::readDouble(const std::string& prompt, bool allowEmpty) {
     std::string input;
     while (true) {
         std::cout << prompt;
-        std::getline(std::cin, input);
+        if (!std::getline(std::cin, input)) {
+            std::cin.clear();
+            if (allowEmpty) return -1.0;
+            continue;
+        }
         if (allowEmpty && input.empty()) return -1.0;
         try {
             size_t pos;
@@ -54,7 +64,12 @@ std::string Menu::readString(const std::string& prompt, bool allowEmpty) {
     std::string input;
     while (true) {
         std::cout << prompt;
-        std::getline(std::cin, input);
+        if (!std::getline(std::cin, input)) {
+            // Ввод оборвался (Ctrl+Z / EOF) — сбрасываем состояние cin
+            std::cin.clear();
+            if (allowEmpty) return "";
+            continue;
+        }
         if (allowEmpty && input.empty()) return "";
         if (!input.empty()) return input;
         std::cerr << "Ошибка: строка не может быть пустой.\n";
@@ -150,7 +165,7 @@ void Menu::handleEditProduct() {
     double newPrice;
     while (true) {
         std::cout << "Новая цена (Enter - оставить без изменений): ";
-        std::getline(std::cin, priceStr);
+        if (!std::getline(std::cin, priceStr)) { std::cin.clear(); continue; }
         if (priceStr.empty()) {
             newPrice = product->getPrice();
             break;
@@ -168,7 +183,7 @@ void Menu::handleEditProduct() {
     int newQuantity;
     while (true) {
         std::cout << "Новое количество (Enter - оставить без изменений): ";
-        std::getline(std::cin, quantStr);
+        if (!std::getline(std::cin, quantStr)) { std::cin.clear(); continue; }
         if (quantStr.empty()) {
             newQuantity = product->getQuantity();
             break;
@@ -325,9 +340,10 @@ void Menu::handleLoad() {
 }
 
 void Menu::run() {
-    // Устанавливаем UTF-8 для корректного отображения кириллицы
+    // Дополнительно дублируем настройки кодировки (на случай, если main не выполнился)
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+    setlocale(LC_ALL, ".UTF8");
 
     std::cout << "Добро пожаловать в систему складского учёта!\n";
 
