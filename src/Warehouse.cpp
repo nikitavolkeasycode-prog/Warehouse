@@ -1,13 +1,38 @@
+#define NOMINMAX
 #include "Warehouse.h"
 #include <algorithm>
 #include <cctype>
 #include <limits>
+#include <string>
+#include <Windows.h>
+
+namespace {
+
+// Корректный регистронезависимый lower-case для UTF-8 строк
+// (std::tolower работает только с ASCII). Используем WinAPI:
+// MultiByteToWideChar(CP_UTF8) -> CharLowerBuffW -> WideCharToMultiByte(CP_UTF8).
+std::string utf8ToLower(const std::string& s) {
+    if (s.empty()) return s;
+    int wideLen = MultiByteToWideChar(CP_UTF8, 0, s.c_str(),
+                                      static_cast<int>(s.size()), nullptr, 0);
+    if (wideLen <= 0) return s;
+    std::wstring wide(static_cast<size_t>(wideLen), L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), static_cast<int>(s.size()),
+                        &wide[0], wideLen);
+    CharLowerBuffW(&wide[0], wideLen);
+    int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), wideLen,
+                                      nullptr, 0, nullptr, nullptr);
+    if (utf8Len <= 0) return s;
+    std::string out(static_cast<size_t>(utf8Len), '\0');
+    WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), wideLen, &out[0], utf8Len,
+                        nullptr, nullptr);
+    return out;
+}
+
+}  // namespace
 
 std::string Warehouse::toLower(const std::string& str) {
-    std::string result = str;
-    std::transform(result.begin(), result.end(), result.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
-    return result;
+    return utf8ToLower(str);
 }
 
 bool Warehouse::isValidPrice(double price) {
@@ -72,9 +97,10 @@ bool Warehouse::removeById(int id) {
 
 bool Warehouse::removeByName(const std::string& name) {
     bool found = false;
+    std::string lowerName = utf8ToLower(name);
     auto it = products.begin();
     while (it != products.end()) {
-        if (toLower(it->getName()) == toLower(name)) {
+        if (utf8ToLower(it->getName()) == lowerName) {
             it = products.erase(it);
             found = true;
         } else {
@@ -86,9 +112,9 @@ bool Warehouse::removeByName(const std::string& name) {
 
 std::vector<Product> Warehouse::searchByName(const std::string& query) const {
     std::vector<Product> result;
-    std::string lowerQuery = toLower(query);
+    std::string lowerQuery = utf8ToLower(query);
     for (const auto& p : products) {
-        if (toLower(p.getName()).find(lowerQuery) != std::string::npos) {
+        if (utf8ToLower(p.getName()).find(lowerQuery) != std::string::npos) {
             result.push_back(p);
         }
     }
@@ -97,9 +123,9 @@ std::vector<Product> Warehouse::searchByName(const std::string& query) const {
 
 std::vector<Product> Warehouse::searchByCategory(const std::string& category) const {
     std::vector<Product> result;
-    std::string lowerCategory = toLower(category);
+    std::string lowerCategory = utf8ToLower(category);
     for (const auto& p : products) {
-        if (toLower(p.getCategory()) == lowerCategory) {
+        if (utf8ToLower(p.getCategory()) == lowerCategory) {
             result.push_back(p);
         }
     }
