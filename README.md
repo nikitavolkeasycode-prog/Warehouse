@@ -113,6 +113,7 @@ WarehouseApp/
 │   ├── FileIO.cpp            # Реализация класса FileIO
 │   ├── Menu.h                # Заголовочный файл класса Menu
 │   └── Menu.cpp              # Реализация класса Menu
+├── screenshots/              # Скриншоты работы программы
 ├── CMakeLists.txt            # Файл сборки CMake
 └── README.md                 # Отчёт по проделанной работе (данный файл)
 ```
@@ -144,10 +145,10 @@ WarehouseApp/
 
 ## 8. Скриншоты работы
 
-![Главное меню](screenshots/menu.png)
-![Добавление товара](screenshots/add_product.png)
-![Поиск товара](screenshots/search.png)
-![Аналитика](screenshots/analytics.png)
+![Главный экран](screenshots/Главный%20экран.png)
+![Добавление товара](screenshots/Добавление%20товара.png)
+![Добавление товара и поиск](screenshots/Добавление%20товара%20И%20поиск.png)
+![Аналитика](screenshots/Аналитика.png)
 
 > **Примечание:** Скриншоты находятся в папке `screenshots/` репозитория.
 
